@@ -1,6 +1,24 @@
 import com.buildworld.game.mod.IMod;
 
+/**
+ * MOD File for Build WOrld
+ * Core mod will implement all of the core features for buildworld
+ * DO NOT ADD CODE TO THIS FILE OUTSIDE OF THE OVERRIDDEN FUNCTIONS
+ * ALSO DO NOT CREATE ADDITIONAL FUNCTIONS IN THIS FILE
+ * ALL OTHER CODE MUST GO INSIDE OF THE PACKAGE com.buildworld.mods.core
+ */
 public class Mod implements IMod {
+    /**
+     * WARNING WARNING WARNING
+     * DO NOT ADD CODE TO THIS FILE OUTSIDE OF THE OVERRIDDEN FUNCTIONS
+     * ALSO DO NOT CREATE ADDITIONAL FUNCTIONS IN THIS FILE
+     * ALL OTHER CODE MUST GO INSIDE OF THE PACKAGE com.buildworld.mods.core
+     */
+
+    /**
+     *
+     * @return
+     */
     @Override
     public String getKey() {
         return "core";
