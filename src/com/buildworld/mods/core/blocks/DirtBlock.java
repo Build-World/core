@@ -1,8 +1,8 @@
 package com.buildworld.mods.core.blocks;
 
-import com.buildworld.engine.graphics.textures.Texture;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.blocks.Material;
+import com.buildworld.game.graphics.Texture;
 
 public class DirtBlock extends Block {
     public DirtBlock() throws Exception {

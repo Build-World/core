@@ -1,10 +1,3 @@
-import com.buildworld.engine.graphics.game.GameItem;
-import com.buildworld.engine.graphics.materials.Material;
-import com.buildworld.engine.graphics.mesh.Mesh;
-import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
-import com.buildworld.engine.graphics.textures.Texture;
-import com.buildworld.game.blocks.Block;
-import com.buildworld.game.blocks.BlockService;
 import com.buildworld.game.mod.IMod;
 import com.buildworld.game.state.GameStateService;
 import com.buildworld.game.state.states.GameState;
@@ -64,7 +57,6 @@ public class Mod implements IMod {
     public void onReady() throws Exception {
 
         GameState gs = (GameState)Services.getService(GameStateService.class).getCurrentState();
-
         gs.getWorld().setBlock(0,40,0, new DirtBlock());
     }
 
