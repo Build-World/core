@@ -2,24 +2,26 @@ package com.buildworld.mods.core.blocks;
 
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
-import com.buildworld.game.graphics.Texture;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.blocks.Material;
 import com.buildworld.game.blocks.types.Mundane;
-import com.buildworld.game.events.IUpdateable;
+import com.buildworld.game.events.IUpdate;
+import com.buildworld.game.graphics.Texture;
 import com.buildworld.mods.core.blocks.properties.Electricity;
 import com.buildworld.mods.core.blocks.types.Electric;
 
-public class Wire extends Block implements IUpdateable {
+public class Battery extends Block implements IUpdate {
+
+    private boolean requiresUpdate = true;
 
     private static Material material;
 
-    public Wire() throws Exception
+    public Battery() throws Exception
     {
-        super("buildworld.mods.core.blocks", "wire", makeMaterial(), new Electric());
+        super("buildworld.mods.core.blocks", "battery", makeMaterial(), new Electric());
     }
 
-    public Wire(Wire original) throws Exception
+    public Battery(Battery original) throws Exception
     {
         this();
     }
@@ -28,14 +30,14 @@ public class Wire extends Block implements IUpdateable {
     {
         if(material == null)
         {
-            material = new Material(new Texture("C:\\Users\\using\\Desktop\\shawn\\build-world\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\wireblock.png"));
+            material = new Material(new Texture("C:\\Users\\using\\Desktop\\shawn\\build-world\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\battery.png"));
         }
         return material;
     }
 
     @Override
     public Block copy() throws Exception {
-        return new Wire(this);
+        return new Battery(this);
     }
 
     public Electricity getElectricity() throws Exception
@@ -46,19 +48,30 @@ public class Wire extends Block implements IUpdateable {
     @Override
     protected void ready() throws Exception {
         Electricity electricity = this.getBlockProperty(Electricity.class);
-        electricity.setResistance(1000f);
+        electricity.setResistance(0f);
         electricity.setMaxamperage(2f);
+        electricity.setAmperage(0.001f);
         electricity.setMaxvoltage(150f);
+        electricity.setInputVoltage(120f);
+    }
+
+
+    @Override
+    public void update() throws Exception {
+        if(requiresUpdate)
+        {
+            updateNeighbors(this);
+            requiresUpdate = false;
+        }
     }
 
     @Override
-    public void update(Block block) throws Exception {
-        try {
-            getElectricity().setAmperage(block.getBlockProperty(Electricity.class).getAmperage());
-            getElectricity().setInputVoltage(block.getBlockProperty(Electricity.class).getOutputVoltage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        updateNeighbors(block);
+    public boolean requiresUpdates() {
+        return true;
+    }
+
+    @Override
+    public void update(Block block) {
+
     }
 }

@@ -10,17 +10,21 @@ import com.buildworld.engine.graphics.lights.DirectionalLight;
 import com.buildworld.engine.graphics.lights.SceneLight;
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.io.MouseInput;
-import com.buildworld.engine.utils.SimplexNoise;
+import com.buildworld.game.blocks.Block;
 import com.buildworld.game.hud.Hud;
 import com.buildworld.game.state.State;
-import com.buildworld.game.world.World;
+import com.buildworld.game.world.WorldController;
+import com.buildworld.game.world.WorldState;
+import com.buildworld.game.world.areas.Galaxy;
+import com.buildworld.game.world.areas.World;
+import com.buildworld.game.world.generators.Planet;
+import com.buildworld.game.world.generators.tests.MyPlanet;
 import com.buildworld.mods.core.blocks.Grass;
+import com.buildworld.mods.core.world.biomes.Plains;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -47,13 +51,14 @@ public class GameState implements State {
     private final int dayLength = 120;
 
     private int camXOld, camZOld;
-    private static final int DESIRED_RENDER_UPDATE_DELAY = 40;
+    private static final int DESIRED_RENDER_UPDATE_DELAY = 400;
     private int render_ticks = DESIRED_RENDER_UPDATE_DELAY;
 
+    private Galaxy galaxy;
     private World world;
     private final int worldSize = 64;
-    public final int worldHeight = 256;
-    private final boolean generateSurfaceLayerOnly = true;
+    private int seed = 42;
+    private ArrayList<Block> myblocks = new ArrayList<>();
 
     public GameState() {
         renderer = new Renderer();
@@ -68,12 +73,12 @@ public class GameState implements State {
 
         scene = new Scene();
 
-        world = new World();
+        galaxy = new Galaxy();
 
         float skyBoxScale = viewDistance;
 
         camera.getPosition().x = 0f;
-        camera.getPosition().y = 32f;
+        camera.getPosition().y = 150f;
         camera.getPosition().z = 0f;
         camXOld = 0;
         camZOld = 0;
@@ -94,26 +99,25 @@ public class GameState implements State {
 
     public void generateWorld() throws Exception
     {
-        int dimension = worldSize * 16;
 
-        long rng = new Random().nextLong();
-        System.out.println("Seed: " + rng);
-        SimplexNoise noise = new SimplexNoise(rng);
+        world = new World(worldSize, WorldState.LOADED);
+        world.setSeed(seed);
+        Planet planet = new MyPlanet(world.getSeed());
+        WorldController worldController = new WorldController(world, planet);
+        worldController.setBiome(new Plains());
 
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                int height = (int) ((noise.eval(i / (float) worldSize, j / (float) worldSize) + 1f) * 16f);
-                for (int w = 0; w < height; w++) {
-                    if (generateSurfaceLayerOnly && w != height - 1)
-                        continue;
-                    int x = i - (dimension / 2);
-                    int y = w;
-                    int z = j - (dimension / 2);
-                    world.setBlock(x, y, z, new Grass());
-                }
-            }
-        }
+        // Essentially loading a 3x3 square of regions around the origin 0,0
+        /*worldController.loadRegion(new Vector2f(-1,-1));
+        worldController.loadRegion(new Vector2f(-1,0));
+        worldController.loadRegion(new Vector2f(-1,1));
+        worldController.loadRegion(new Vector2f(0,-1));*/
+        worldController.loadRegion(new Vector2f(0,0));
+        /*worldController.loadRegion(new Vector2f(0,1));
+        worldController.loadRegion(new Vector2f(1,-1));
+        worldController.loadRegion(new Vector2f(1,0));
+        worldController.loadRegion(new Vector2f(1,1));*/
 
+        scene.setGameItems(world.getRegion(0, World.worldHeight, 0, viewDistance));
     }
 
     private void setupLights() {
@@ -159,7 +163,7 @@ public class GameState implements State {
     @Override
     public void update(float interval, MouseInput mouseInput) throws Exception {
 
-        scene.setGameItems(world.getUpdatedInRange(camXOld, camZOld, loadDistance));
+        //scene.setGameItems(world.getUpdatedInRange(camXOld, camZOld, loadDistance));
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
@@ -208,7 +212,8 @@ public class GameState implements State {
         if(render_ticks == 0)
         {
             int camX = (int)camera.getPosition().x, camZ= (int)camera.getPosition().z;
-            if(camX != camXOld || camZ != camZOld)
+            System.out.println("Cam coords: " + camX + ", " + (int)camera.getPosition().y + ", " + camZ);
+            /*if(camX != camXOld || camZ != camZOld)
             {
                 Vector2f[] coords = world.getMovedRegionCoords(camXOld,camZOld,camX,camZ, loadDistance);
                 Vector2f[] flipped = world.flipMovedRegionCoords(coords, camXOld,camZOld,loadDistance, true, true);
@@ -218,7 +223,14 @@ public class GameState implements State {
             }
 
             camXOld = camX;
-            camZOld = camZ;
+            camZOld = camZ;*/
+
+//            scene.removeGameItems(myblocks.toArray(new Block[0]));
+//            System.out.println("Removed");
+//            Block[] blockus = world.getRegion(camX, World.worldHeight, camZ, viewDistance);
+//            myblocks = new ArrayList<>(Arrays.asList(blockus));
+//            scene.setGameItems(blockus);
+//            System.out.println("Added");
         }
 
         render_ticks--;

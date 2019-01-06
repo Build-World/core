@@ -4,6 +4,7 @@ import com.buildworld.game.mod.IMod;
 import com.buildworld.game.state.GameStateService;
 import com.buildworld.game.state.GameStatesService;
 import com.buildworld.game.state.State;
+import com.buildworld.mods.core.blocks.Battery;
 import com.buildworld.mods.core.blocks.Dirt;
 import com.buildworld.mods.core.blocks.Grass;
 import com.buildworld.mods.core.blocks.Wire;
@@ -67,10 +68,12 @@ public class Mod implements IMod {
         // Registering block properties
         Services.getService(BlockPropertyService.class).add(new Electricity());
 
+        GameState gs = (GameState)Services.getService(GameStateService.class).getCurrentState();
         // Registering blocks
         new Dirt().register();
         new Grass().register();
         new Wire().register();
+        new Battery().register();
     }
 
     @Override
@@ -79,12 +82,13 @@ public class Mod implements IMod {
         gs.generateWorld();
         Wire w1 = new Wire();
         w1.getElectricity().setResistance(0.05f);
-        gs.getWorld().setBlock(0,40,0, new Dirt());
-        gs.getWorld().setBlock(0,32,1, w1);
-        gs.getWorld().setBlock(1,32,1, new Wire());
-        gs.getWorld().setBlock(2,32,1, new Wire());
-        gs.getWorld().setBlock(3,32,1, new Wire());
-        gs.getWorld().setBlock(4,32,1, new Wire());
+        gs.getWorld().setBlock(0,162,0, new Dirt());
+        gs.getWorld().setBlock(0,160,1, w1);
+        gs.getWorld().setBlock(1,160,1, new Wire());
+        gs.getWorld().setBlock(2,160,1, new Wire());
+        gs.getWorld().setBlock(3,160,1, new Wire());
+        gs.getWorld().setBlock(4,160,1, new Wire());
+        gs.getWorld().setBlock(5,160,1, new Battery());
     }
 
     @Override

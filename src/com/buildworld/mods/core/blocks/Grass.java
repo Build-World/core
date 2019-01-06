@@ -2,27 +2,38 @@ package com.buildworld.mods.core.blocks;
 
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
+import com.buildworld.game.graphics.Texture;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.blocks.Material;
+import com.buildworld.game.blocks.tests.MyBlock;
 import com.buildworld.game.blocks.types.Mundane;
-import com.buildworld.game.graphics.Texture;
 
 public class Grass extends Block {
 
-    private static Mesh mesh;
+    private static Material material;
 
     public Grass() throws Exception
     {
-        super("buildworld.mods.core.blocks", "grass", makeMesh(), Mundane.make());
+        super("buildworld.mods.core.blocks", "grass", makeMaterial(), Mundane.make());
     }
 
-    private static Mesh makeMesh() throws Exception
+    public Grass(Grass original) throws Exception
     {
-        if(mesh == null)
+        this();
+    }
+
+    private static Material makeMaterial() throws Exception
+    {
+        if(material == null)
         {
-            mesh = new CubeMesh().make(new Material(new Texture("C:\\Users\\using\\Desktop\\shawn\\build-world\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\grassblock.png")));
+            material = new Material(new Texture("C:\\Users\\using\\Desktop\\shawn\\build-world\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\grassblock.png"));
         }
-        return mesh;
+        return material;
+    }
+
+    @Override
+    public Block copy() throws Exception {
+        return new Grass(this);
     }
 
 
