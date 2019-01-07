@@ -21,6 +21,7 @@ import com.buildworld.game.world.generators.Planet;
 import com.buildworld.game.world.generators.tests.MyPlanet;
 import com.buildworld.mods.core.blocks.Grass;
 import com.buildworld.mods.core.world.biomes.Plains;
+import com.buildworld.mods.core.world.planets.Earth;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -50,20 +51,21 @@ public class GameState implements State {
     private final int loadDistance = viewDistance + 1 * 16;
     private final int dayLength = 120;
 
-    private int camXOld, camZOld;
-    private static final int DESIRED_RENDER_UPDATE_DELAY = 400;
+    private Vector3f camPos;
+    private static final int DESIRED_RENDER_UPDATE_DELAY = 10;
     private int render_ticks = DESIRED_RENDER_UPDATE_DELAY;
 
     private Galaxy galaxy;
     private World world;
     private final int worldSize = 64;
     private int seed = 42;
-    private ArrayList<Block> myblocks = new ArrayList<>();
+
 
     public GameState() {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
+        camPos = new Vector3f(0,0,0);
         lightAngle = -90;
     }
 
@@ -80,8 +82,7 @@ public class GameState implements State {
         camera.getPosition().x = 0f;
         camera.getPosition().y = 150f;
         camera.getPosition().z = 0f;
-        camXOld = 0;
-        camZOld = 0;
+        camPos = new Vector3f(camera.getPosition());
 
         //scene.setGameItems(world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, loadDistance));
 
@@ -102,7 +103,7 @@ public class GameState implements State {
 
         world = new World(worldSize, WorldState.LOADED);
         world.setSeed(seed);
-        Planet planet = new MyPlanet(world.getSeed());
+        Planet planet = new Earth(world.getSeed());
         WorldController worldController = new WorldController(world, planet);
         worldController.setBiome(new Plains());
 
@@ -117,7 +118,9 @@ public class GameState implements State {
         worldController.loadRegion(new Vector2f(1,0));
         worldController.loadRegion(new Vector2f(1,1));*/
 
-        scene.setGameItems(world.getRegion(0, World.worldHeight, 0, viewDistance));
+        scene.setGameItems(world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance));
+        world.getAdded().clear();
+        //scene.setGameItems(world.getUpdatedInRange((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance));
     }
 
     private void setupLights() {
@@ -163,7 +166,7 @@ public class GameState implements State {
     @Override
     public void update(float interval, MouseInput mouseInput) throws Exception {
 
-        //scene.setGameItems(world.getUpdatedInRange(camXOld, camZOld, loadDistance));
+        scene.setGameItems(world.getUpdatedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance));
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
@@ -211,26 +214,20 @@ public class GameState implements State {
 
         if(render_ticks == 0)
         {
-            int camX = (int)camera.getPosition().x, camZ= (int)camera.getPosition().z;
-            System.out.println("Cam coords: " + camX + ", " + (int)camera.getPosition().y + ", " + camZ);
-            /*if(camX != camXOld || camZ != camZOld)
+            int camX = (int)camera.getPosition().x, camZ= (int)camera.getPosition().z, camY = (int)camera.getPosition().y;
+            System.out.println("Cam coords: " + camX + ", " + camY + ", " + camZ);
+            if(camX != (int)camPos.x || camZ != (int)camPos.z || camY != (int)camPos.y)
             {
-                Vector2f[] coords = world.getMovedRegionCoords(camXOld,camZOld,camX,camZ, loadDistance);
-                Vector2f[] flipped = world.flipMovedRegionCoords(coords, camXOld,camZOld,loadDistance, true, true);
+                Vector3f[] coords = world.getMovedRegionCoords((int)camPos.x, (int)camPos.y, (int)camPos.z,camX,camY,camZ, loadDistance);
+                Vector3f[] flipped = world.flipMovedRegionCoords(coords, (int)camPos.x,(int)camPos.y,(int)camPos.z, true,true, true);
 
-                scene.removeGameItems(world.getMovedRegion(world.translateRegionCoords(flipped, new Vector2f(camX - camXOld, camZ - camZOld)), 0, worldHeight));
-                scene.setGameItems(world.getMovedRegion(coords, 0, worldHeight));
+                System.out.println("coords: " + coords.length);
+
+                scene.removeGameItems(world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z))));
+                scene.setGameItems(world.getMovedRegion(coords));
             }
 
-            camXOld = camX;
-            camZOld = camZ;*/
-
-//            scene.removeGameItems(myblocks.toArray(new Block[0]));
-//            System.out.println("Removed");
-//            Block[] blockus = world.getRegion(camX, World.worldHeight, camZ, viewDistance);
-//            myblocks = new ArrayList<>(Arrays.asList(blockus));
-//            scene.setGameItems(blockus);
-//            System.out.println("Added");
+            camPos.set(camX, camY, camZ);
         }
 
         render_ticks--;
