@@ -7,13 +7,14 @@ public class Earth extends Planet {
     public Earth() {
         setFeatureNoiseFeatureSizeModifier(9f);
         setHeightNoiseFeatureSize(1.5f);
+        setMinimumSurfaceThickness(1);
     }
 
     public Earth(int seed) {
         super(seed);
         setFeatureNoiseFeatureSizeModifier(9f);
         setHeightNoiseFeatureSize(1.5f);
-        setCavePertrusionThickness(1);
+        setMinimumSurfaceThickness(1);
     }
 
     @Override

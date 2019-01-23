@@ -59,7 +59,7 @@ public class GameStateTest implements State {
 
     private Vector2f currentCameraRegion = new Vector2f(0, 0);
 
-    private static final float CAMERA_POS_STEP = 0.10f;
+    private static final float CAMERA_POS_STEP = 0.40f;
 
     private float angleInc;
 
