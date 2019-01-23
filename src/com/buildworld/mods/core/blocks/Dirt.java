@@ -1,5 +1,6 @@
 package com.buildworld.mods.core.blocks;
 
+import com.buildworld.game.Game;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.blocks.Material;
 import com.buildworld.game.blocks.types.Mundane;
@@ -22,7 +23,7 @@ public class Dirt extends Block {
     {
         if(material == null)
         {
-            material = new Material(new Texture("C:\\Users\\using\\Desktop\\shawn\\build-world\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\dirtblock.png"));
+            material = new Material(new Texture(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\dirtblock.png"));
         }
         return material;
     }

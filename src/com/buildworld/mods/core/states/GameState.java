@@ -10,6 +10,7 @@ import com.buildworld.engine.graphics.lights.DirectionalLight;
 import com.buildworld.engine.graphics.lights.SceneLight;
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.io.MouseInput;
+import com.buildworld.game.Game;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.hud.Hud;
 import com.buildworld.game.state.State;
@@ -87,7 +88,7 @@ public class GameState implements State {
         //scene.setGameItems(world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, loadDistance));
 
         // Setup  SkyBox
-        SkyBox skyBox = new SkyBox("C:\\Users\\using\\Desktop\\shawn\\build-world\\engine\\resources/models/skybox.obj", "C:\\Users\\using\\Desktop\\shawn\\build-world\\engine\\resources/textures/skybox.png");
+        SkyBox skyBox = new SkyBox(Game.path + "\\engine\\resources/models/skybox.obj", Game.path + "\\engine\\resources/textures/skybox.png");
         skyBox.setScale(skyBoxScale);
         scene.setSkyBox(skyBox);
 
@@ -174,7 +175,7 @@ public class GameState implements State {
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
 
             // Update HUD compass
-            hud.rotateCompass(camera.getRotation().y);
+//            hud.rotateCompass(camera.getRotation().y);
         }
 
         // Update camera position
@@ -218,10 +219,10 @@ public class GameState implements State {
             System.out.println("Cam coords: " + camX + ", " + camY + ", " + camZ);
             if(camX != (int)camPos.x || camZ != (int)camPos.z || camY != (int)camPos.y)
             {
-                Vector3f[] coords = world.getMovedRegionCoords((int)camPos.x, (int)camPos.y, (int)camPos.z,camX,camY,camZ, loadDistance);
-                Vector3f[] flipped = world.flipMovedRegionCoords(coords, (int)camPos.x,(int)camPos.y,(int)camPos.z, true,true, true);
+                List<Vector3f> coords = world.getMovedRegionCoords((int)camPos.x, (int)camPos.y, (int)camPos.z,camX,camY,camZ, loadDistance);
+                List<Vector3f> flipped = world.flipMovedRegionCoords(coords, (int)camPos.x,(int)camPos.y,(int)camPos.z, true,true, true);
 
-                System.out.println("coords: " + coords.length);
+                System.out.println("coords: " + coords.size());
 
                 scene.removeGameItems(world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z))));
                 scene.setGameItems(world.getMovedRegion(coords));

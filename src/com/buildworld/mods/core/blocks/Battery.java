@@ -2,6 +2,7 @@ package com.buildworld.mods.core.blocks;
 
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
+import com.buildworld.game.Game;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.blocks.Material;
 import com.buildworld.game.blocks.types.Mundane;
@@ -30,7 +31,7 @@ public class Battery extends Block implements IUpdate {
     {
         if(material == null)
         {
-            material = new Material(new Texture("C:\\Users\\using\\Desktop\\shawn\\build-world\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\battery.png"));
+            material = new Material(new Texture(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\battery.png"));
         }
         return material;
     }

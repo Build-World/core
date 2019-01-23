@@ -10,6 +10,7 @@ import com.buildworld.mods.core.blocks.Grass;
 import com.buildworld.mods.core.blocks.Wire;
 import com.buildworld.mods.core.blocks.properties.Electricity;
 import com.buildworld.mods.core.states.GameState;
+import com.buildworld.mods.core.states.GameStateTest;
 import com.shawnclake.morgencore.core.component.services.Services;
 
 /**
@@ -55,41 +56,45 @@ public class Mod implements IMod {
     public void onBoot(Window window) throws Exception {
 
         // Adding game state
-        State state = new GameState();
-        state.init(window);
-        Services.getService(GameStatesService.class).add(state);
+        //State state = new GameState();
+        State state2 = new GameStateTest();
+        //state.init(window);
+        state2.init(window);
+        //Services.getService(GameStatesService.class).add(state);
+        Services.getService(GameStatesService.class).add(state2);
     }
 
     @Override
     public void onLoad() throws Exception {
         // Changing to game state
-        Services.getService(GameStateService.class).change(GameState.class);
+        //Services.getService(GameStateService.class).change(GameState.class);
+        Services.getService(GameStateService.class).change(GameStateTest.class);
 
         // Registering block properties
         Services.getService(BlockPropertyService.class).add(new Electricity());
 
-        GameState gs = (GameState)Services.getService(GameStateService.class).getCurrentState();
-        // Registering blocks
-        new Dirt().register();
-        new Grass().register();
-        new Wire().register();
-        new Battery().register();
+//        GameState gs = (GameState)Services.getService(GameStateService.class).getCurrentState();
+//        // Registering blocks
+//        new Dirt().register();
+//        new Grass().register();
+//        new Wire().register();
+//        new Battery().register();
     }
 
     @Override
     public void onReady() throws Exception {
-        GameState gs = (GameState)Services.getService(GameStateService.class).getCurrentState();
-        gs.generateWorld();
-        Wire w1 = new Wire();
-        w1.getElectricity().setResistance(0.05f);
-        gs.getWorld().setBlock(0,162,0, new Dirt());
-        gs.getWorld().setBlock(0,160,1, w1);
-        gs.getWorld().setBlock(1,160,1, new Wire());
-        gs.getWorld().setBlock(2,160,1, new Wire());
-        gs.getWorld().setBlock(3,160,1, new Wire());
-        gs.getWorld().setBlock(4,160,1, new Wire());
-        gs.getWorld().setBlock(5,160,1, new Battery());
-    }
+//        GameStateTest gs = (GameStateTest)Services.getService(GameStateService.class).getCurrentState();
+//        gs.generateWorld();
+//        Wire w1 = new Wire();
+//        w1.getElectricity().setResistance(0.05f);
+//        gs.getWorld().setBlock(0,162,0, new Dirt());
+//        gs.getWorld().setBlock(0,160,1, w1);
+//        gs.getWorld().setBlock(1,160,1, new Wire());
+//        gs.getWorld().setBlock(2,160,1, new Wire());
+//        gs.getWorld().setBlock(3,160,1, new Wire());
+//        gs.getWorld().setBlock(4,160,1, new Wire());
+//        gs.getWorld().setBlock(5,160,1, new Battery());
+}
 
     @Override
     public void onPlay() throws Exception {
