@@ -13,6 +13,7 @@ public class Earth extends Planet {
         super(seed);
         setFeatureNoiseFeatureSizeModifier(9f);
         setHeightNoiseFeatureSize(1.5f);
+        setCavePertrusionThickness(1);
     }
 
     @Override

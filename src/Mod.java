@@ -83,11 +83,11 @@ public class Mod implements IMod {
 
     @Override
     public void onReady() throws Exception {
-//        GameStateTest gs = (GameStateTest)Services.getService(GameStateService.class).getCurrentState();
-//        gs.generateWorld();
+        GameStateTest gs = (GameStateTest)Services.getService(GameStateService.class).getCurrentState();
+        gs.generateWorld();
 //        Wire w1 = new Wire();
-//        w1.getElectricity().setResistance(0.05f);
-//        gs.getWorld().setBlock(0,162,0, new Dirt());
+        //w1.getElectricity().setResistance(0.05f);
+        gs.getWorld().setBlock(0,162,0, new Dirt());
 //        gs.getWorld().setBlock(0,160,1, w1);
 //        gs.getWorld().setBlock(1,160,1, new Wire());
 //        gs.getWorld().setBlock(2,160,1, new Wire());
