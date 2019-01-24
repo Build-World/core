@@ -29,6 +29,8 @@ import com.buildworld.game.world.areas.Galaxy;
 import com.buildworld.game.world.areas.Region;
 import com.buildworld.game.world.areas.World;
 import com.buildworld.game.world.generators.Planet;
+import com.buildworld.mods.core.world.biomes.DesertPlains;
+import com.buildworld.mods.core.world.biomes.FrozenPlains;
 import com.buildworld.mods.core.world.biomes.Plains;
 import com.buildworld.mods.core.world.planets.Earth;
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -78,7 +80,7 @@ public class GameStateTest implements State {
     private Galaxy galaxy;
     private World world;
     private final int worldSize = 64;
-    private int seed = 69;
+    private int seed = 4242;
 
     private WorldController worldController;
 
@@ -226,7 +228,9 @@ public class GameStateTest implements State {
         world.setSeed(seed);
         Planet planet = new Earth(world.getSeed());
         WorldController worldController = new WorldController(world, planet);
-        worldController.setBiome(new Plains());
+        worldController.getBiomes().add(new Plains());
+        worldController.getBiomes().add(new FrozenPlains());
+        worldController.getBiomes().add(new DesertPlains());
 
         // Essentially loading a 3x3 square of regions around the origin 0,0
         //worldController.loadRegion(new Vector2f(-1,-1));

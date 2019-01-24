@@ -106,7 +106,7 @@ public class GameState implements State {
         world.setSeed(seed);
         Planet planet = new Earth(world.getSeed());
         WorldController worldController = new WorldController(world, planet);
-        worldController.setBiome(new Plains());
+        worldController.getBiomes().add(new Plains());
 
         // Essentially loading a 3x3 square of regions around the origin 0,0
         /*worldController.loadRegion(new Vector2f(-1,-1));

@@ -3,21 +3,23 @@ package com.buildworld.mods.core.world.biomes;
 import com.buildworld.game.world.generators.Biome;
 import com.buildworld.mods.core.blocks.*;
 
-public class Plains extends Biome {
+public class FrozenPlains extends Biome {
 
-    public Plains() throws Exception {
+    public FrozenPlains() throws Exception {
         setCoreThickness(5);
 
-        setTemperature(20);
-        setTemperatureRange(10);
-        setPercipitation(0.5f);
+        setTemperature(-25);
+        setTemperatureRange(15);
+        setPercipitation(0.2f);
         setPercipitationRange(0.1f);
 
         setCore(new Magma());
         setRock(new Rock());
         setCrust(new Dirt());
-        setSurface(new Grass());
-        setWater(new Water());
+        setSurface(new Rock());
+        setWater(new Ice());
+
+        setSurfaceThickness(5);
     }
 
     @Override
@@ -32,6 +34,6 @@ public class Plains extends Biome {
 
     @Override
     public String getName() {
-        return "Plains";
+        return "Frozen Plains";
     }
 }

@@ -85,15 +85,15 @@ public class Mod implements IMod {
     public void onReady() throws Exception {
         GameStateTest gs = (GameStateTest)Services.getService(GameStateService.class).getCurrentState();
         gs.generateWorld();
-//        Wire w1 = new Wire();
-        //w1.getElectricity().setResistance(0.05f);
+        Wire w1 = new Wire();
+        w1.getElectricity().setResistance(0.05f);
         gs.getWorld().setBlock(0,162,0, new Dirt());
-//        gs.getWorld().setBlock(0,160,1, w1);
-//        gs.getWorld().setBlock(1,160,1, new Wire());
-//        gs.getWorld().setBlock(2,160,1, new Wire());
-//        gs.getWorld().setBlock(3,160,1, new Wire());
-//        gs.getWorld().setBlock(4,160,1, new Wire());
-//        gs.getWorld().setBlock(5,160,1, new Battery());
+        gs.getWorld().setBlock(0,160,1, w1);
+        gs.getWorld().setBlock(1,160,1, new Wire());
+        gs.getWorld().setBlock(2,160,1, new Wire());
+        gs.getWorld().setBlock(3,160,1, new Wire());
+        gs.getWorld().setBlock(4,160,1, new Wire());
+        gs.getWorld().setBlock(5,160,1, new Battery());
 }
 
     @Override
