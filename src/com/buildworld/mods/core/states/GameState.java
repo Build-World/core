@@ -1,8 +1,8 @@
 package com.buildworld.mods.core.states;
 
-import com.buildworld.engine.graphics.Camera;
 import com.buildworld.engine.graphics.Renderer;
 import com.buildworld.engine.graphics.Window;
+import com.buildworld.engine.graphics.camera.Camera;
 import com.buildworld.engine.graphics.game.GameItem;
 import com.buildworld.engine.graphics.game.Scene;
 import com.buildworld.engine.graphics.game.SkyBox;
@@ -45,6 +45,8 @@ public class GameState implements State {
     private Hud hud;
 
     private float lightAngle;
+
+    private boolean sceneChanged = false;
 
     private static final float CAMERA_POS_STEP = 0.6f;
 
@@ -96,7 +98,8 @@ public class GameState implements State {
         setupLights();
 
         // Create HUD
-        hud = new Hud("DEMO");
+        hud = new Hud();
+        hud.init(window);
     }
 
     public void generateWorld() throws Exception
@@ -238,8 +241,8 @@ public class GameState implements State {
 
     @Override
     public void render(Window window) {
-        hud.updateSize(window);
-        renderer.render(window, camera, scene, hud);
+        hud.render(window);
+        renderer.render(window, camera, scene, this.sceneChanged);
     }
 
     @Override

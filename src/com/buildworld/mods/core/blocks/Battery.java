@@ -1,5 +1,6 @@
 package com.buildworld.mods.core.blocks;
 
+import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
 import com.buildworld.game.Game;
@@ -19,7 +20,7 @@ public class Battery extends Block implements IUpdate {
 
     public Battery() throws Exception
     {
-        super("buildworld.mods.core.blocks", "battery", makeMaterial(), new Electric());
+        super("buildworld.mods.core.blocks", "battery", new Electric());
     }
 
     public Battery(Battery original) throws Exception
@@ -27,13 +28,9 @@ public class Battery extends Block implements IUpdate {
         this();
     }
 
-    private static Material makeMaterial() throws Exception
-    {
-        if(material == null)
-        {
-            material = new Material(new Texture(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\battery.png"));
-        }
-        return material;
+    @Override
+    public Mesh[] makeMesh() throws Exception {
+        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt\\cube.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt");
     }
 
     @Override

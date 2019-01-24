@@ -1,5 +1,7 @@
 package com.buildworld.mods.core.blocks;
 
+import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
+import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.game.Game;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.blocks.Material;
@@ -11,7 +13,7 @@ public class Magma extends Block {
 
     public Magma() throws Exception
     {
-        super("buildworld.mods.core.blocks", "magma", makeMaterial(), Mundane.make());
+        super("buildworld.mods.core.blocks", "magma", Mundane.make());
     }
 
     public Magma(Magma original) throws Exception
@@ -19,13 +21,9 @@ public class Magma extends Block {
         this();
     }
 
-    private static Material makeMaterial() throws Exception
-    {
-        if(material == null)
-        {
-            material = new Material(new Texture(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\magma.png"));
-        }
-        return material;
+    @Override
+    public Mesh[] makeMesh() throws Exception {
+        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt\\cube.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt");
     }
 
     @Override

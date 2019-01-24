@@ -209,7 +209,8 @@ public class GameStateTest implements State {
 //        scene.setSkyBox(skyBox);
 
         // Setup  SkyBox
-        SkyBox skyBox = new SkyBox(Game.path + "\\engine\\resources/models/skybox.obj", Game.path + "\\engine\\resources/textures/skybox.png");
+
+        SkyBox skyBox = new SkyBox(Game.path + "\\engine\\resources/models/skybox.obj", "\\engine\\resources/textures/skybox.png");
         skyBox.setScale(viewDistance);
         scene.setSkyBox(skyBox);
 

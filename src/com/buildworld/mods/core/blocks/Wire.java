@@ -1,5 +1,6 @@
 package com.buildworld.mods.core.blocks;
 
+import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
 import com.buildworld.engine.graphics.mesh.Mesh;
 import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
 import com.buildworld.game.Game;
@@ -17,7 +18,7 @@ public class Wire extends Block implements IUpdateable {
 
     public Wire() throws Exception
     {
-        super("buildworld.mods.core.blocks", "wire", makeMaterial(), new Electric());
+        super("buildworld.mods.core.blocks", "wire", new Electric());
     }
 
     public Wire(Wire original) throws Exception
@@ -25,13 +26,9 @@ public class Wire extends Block implements IUpdateable {
         this();
     }
 
-    private static Material makeMaterial() throws Exception
-    {
-        if(material == null)
-        {
-            material = new Material(new Texture(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\textures\\wireblock.png"));
-        }
-        return material;
+    @Override
+    public Mesh[] makeMesh() throws Exception {
+        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt\\cube.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt");
     }
 
     @Override
