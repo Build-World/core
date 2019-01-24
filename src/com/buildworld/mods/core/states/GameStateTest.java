@@ -1,13 +1,14 @@
 package com.buildworld.mods.core.states;
 
-import com.buildworld.engine.graphics.Camera;
 import com.buildworld.engine.graphics.Renderer;
 import com.buildworld.engine.graphics.Window;
+import com.buildworld.engine.graphics.camera.Camera;
 import com.buildworld.engine.graphics.game.GameItem;
 import com.buildworld.engine.graphics.game.Scene;
 import com.buildworld.engine.graphics.game.SkyBox;
 import com.buildworld.engine.graphics.game.Terrain;
 import com.buildworld.engine.graphics.lights.DirectionalLight;
+import com.buildworld.engine.graphics.lights.PointLight;
 import com.buildworld.engine.graphics.lights.SceneLight;
 import com.buildworld.engine.graphics.loaders.OBJLoader;
 import com.buildworld.engine.graphics.materials.Material;
@@ -59,6 +60,10 @@ public class GameStateTest implements State {
 
     private Hud hud;
 
+    private boolean sceneChanged;
+
+    private boolean firstTime;
+
     private Vector2f currentCameraRegion = new Vector2f(0, 0);
 
     private static final float CAMERA_POS_STEP = 0.40f;
@@ -83,6 +88,8 @@ public class GameStateTest implements State {
     private int seed = 4242;
 
     private WorldController worldController;
+
+    private Vector3f pointLightPos;
 
 
     public GameStateTest() {
@@ -218,8 +225,6 @@ public class GameStateTest implements State {
 
         camPos = new Vector3f(camera.getPosition());
 
-        hud = new Hud("BUILD WORLD");
-
     }
 
     public void generateWorld() throws Exception
@@ -261,35 +266,55 @@ public class GameStateTest implements State {
         float lightIntensity = 1.0f;
         Vector3f lightDirection = new Vector3f(0, 1, 1);
         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), lightDirection, lightIntensity);
-        directionalLight.setShadowPosMult(10);
-        directionalLight.setOrthoCords(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 20.0f);
         sceneLight.setDirectionalLight(directionalLight);
+
+        pointLightPos = new Vector3f(0.0f, 25.0f, 0.0f);
+        Vector3f pointLightColour = new Vector3f(0.0f, 1.0f, 0.0f);
+        PointLight.Attenuation attenuation = new PointLight.Attenuation(1, 0.0f, 0);
+        PointLight pointLight = new PointLight(pointLightColour, pointLightPos, lightIntensity, attenuation);
+        sceneLight.setPointLightList( new PointLight[] {pointLight});
     }
 
     @Override
     public void input(Window window, MouseInput mouseInput) {
+        sceneChanged = false;
         cameraInc.set(0, 0, 0);
         if (window.isKeyPressed(GLFW_KEY_W)) {
+            sceneChanged = true;
             cameraInc.z = -1;
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
+            sceneChanged = true;
             cameraInc.z = 1;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
+            sceneChanged = true;
             cameraInc.x = -1;
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            sceneChanged = true;
             cameraInc.x = 1;
         }
         if (window.isKeyPressed(GLFW_KEY_Z)) {
+            sceneChanged = true;
             cameraInc.y = -1;
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
+            sceneChanged = true;
             cameraInc.y = 1;
         }
         if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+            sceneChanged = true;
             angleInc -= 0.05f;
         } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
+            sceneChanged = true;
             angleInc += 0.05f;
         } else {
             angleInc = 0;
+        }
+        if (window.isKeyPressed(GLFW_KEY_UP)) {
+            sceneChanged = true;
+            pointLightPos.y += 0.5f;
+        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+            sceneChanged = true;
+            pointLightPos.y -= 0.5f;
         }
     }
 
@@ -297,21 +322,15 @@ public class GameStateTest implements State {
     public void update(float interval, MouseInput mouseInput) throws Exception {
         scene.setGameItems(world.getUpdatedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance));
 
-        // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
+            // Update camera based on mouse
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
+            sceneChanged = true;
         }
 
         // Update camera position
-        Vector3f prevPos = new Vector3f(camera.getPosition());
         camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-        // Check if there has been a collision. If true, set the y position to
-        // the maximum height
-//        float height = terrain != null ? terrain.getHeight(camera.getPosition()) : -Float.MAX_VALUE;
-//        if (camera.getPosition().y <= height) {
-//            camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
-//        }
 
         lightAngle += angleInc;
         if (lightAngle < 0) {
@@ -326,6 +345,9 @@ public class GameStateTest implements State {
         lightDirection.y = yValue;
         lightDirection.z = zValue;
         lightDirection.normalize();
+
+        // Update view matrix
+        camera.updateViewMatrix();
 
         // TODO: Coordinate calculations in List<Vector3f> spawn tons of vectors.
 
@@ -401,19 +423,18 @@ public class GameStateTest implements State {
 
     @Override
     public void render(Window window) {
-        if (hud != null) {
-            hud.updateSize(window);
+        if (firstTime) {
+            sceneChanged = true;
+            firstTime = false;
         }
-        renderer.render(window, camera, scene, hud);
+        renderer.render(window, camera, scene, sceneChanged);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
+
         scene.cleanup();
-        if (hud != null) {
-            hud.cleanup();
-        }
     }
 
     @Override
