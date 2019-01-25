@@ -19,7 +19,6 @@ import com.buildworld.game.world.WorldState;
 import com.buildworld.game.world.areas.Galaxy;
 import com.buildworld.game.world.areas.World;
 import com.buildworld.game.world.generators.Planet;
-import com.buildworld.game.world.generators.tests.MyPlanet;
 import com.buildworld.mods.core.blocks.Grass;
 import com.buildworld.mods.core.world.biomes.Plains;
 import com.buildworld.mods.core.world.planets.Earth;

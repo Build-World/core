@@ -1,5 +1,9 @@
 package com.buildworld.mods.core.states;
 
+import com.buildworld.engine.audio.sound.SoundBuffer;
+import com.buildworld.engine.audio.sound.SoundListener;
+import com.buildworld.engine.audio.sound.SoundManager;
+import com.buildworld.engine.audio.sound.SoundSource;
 import com.buildworld.engine.graphics.Renderer;
 import com.buildworld.engine.graphics.Window;
 import com.buildworld.engine.graphics.camera.Camera;
@@ -11,6 +15,7 @@ import com.buildworld.engine.graphics.lights.DirectionalLight;
 import com.buildworld.engine.graphics.lights.PointLight;
 import com.buildworld.engine.graphics.lights.SceneLight;
 import com.buildworld.engine.graphics.loaders.OBJLoader;
+import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
 import com.buildworld.engine.graphics.materials.Material;
 import com.buildworld.engine.graphics.mesh.HeightMapMesh;
 import com.buildworld.engine.graphics.mesh.Mesh;
@@ -22,6 +27,7 @@ import com.buildworld.engine.io.MouseInput;
 import com.buildworld.game.Game;
 import com.buildworld.game.blocks.Block;
 import com.buildworld.game.hud.Hud;
+import com.buildworld.game.interactables.MouseBoxSelectionDetector;
 import com.buildworld.game.state.State;
 import com.buildworld.game.world.WorldController;
 import com.buildworld.game.world.WorldState;
@@ -39,6 +45,7 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.openal.AL11;
 
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
@@ -62,7 +69,16 @@ public class GameStateTest implements State {
 
     private boolean sceneChanged;
 
+    private final SoundManager soundMgr;
+
+    private FlowParticleEmitter particleEmitter;
+
+    private MouseBoxSelectionDetector selectDetector;
+
+    private boolean leftButtonPressed;
+
     private boolean firstTime;
+
 
     private Vector2f currentCameraRegion = new Vector2f(0, 0);
 
@@ -71,8 +87,6 @@ public class GameStateTest implements State {
     private float angleInc;
 
     private float lightAngle;
-
-    private FlowParticleEmitter particleEmitter;
 
     private final int viewDistance = 4 * 16;
     private final int loadDistance = viewDistance + 1 * 16;
@@ -92,8 +106,14 @@ public class GameStateTest implements State {
     private Vector3f pointLightPos;
 
 
+    private enum Sounds {
+        FIRE
+    };
+
     public GameStateTest() {
         renderer = new Renderer();
+        hud = new Hud();
+        soundMgr = new SoundManager();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
         angleInc = 0;
@@ -118,12 +138,14 @@ public class GameStateTest implements State {
 
     @Override
     public void init(Window window) throws Exception {
+        hud.init(window);
         renderer.init(window);
+        soundMgr.init();
+
+        leftButtonPressed = false;
 
         scene = new Scene();
         galaxy = new Galaxy();
-
-        float reflectance = 1f;
 
         ///// THIS IS WHERE THE COMMENT BEGAN
 
@@ -194,14 +216,20 @@ public class GameStateTest implements State {
 //        this.scene.setParticleEmitters(new FlowParticleEmitter[]{particleEmitter});
 
 
+        Mesh[] houseMesh = StaticMeshesLoader.load(Game.path + "\\engine\\resources\\models\\house/house.obj", "\\engine\\resources\\models\\house");
+        GameItem house = new GameItem(houseMesh);
+        house.setPosition(0,32,0);
+        scene.setGameItems(new GameItem[]{house});
+
+
         ///// THIS IS WHERE THE COMMENT ENDED
 
         // Shadows
-        scene.setRenderShadows(false);
+        scene.setRenderShadows(true);
 
         // Fog
-        Vector3f fogColour = new Vector3f(0.5f, 0.5f, 0.5f);
-        scene.setFog(new Fog(true, fogColour, 0.02f));
+//        Vector3f fogColour = new Vector3f(0.5f, 0.5f, 0.5f);
+//        scene.setFog(new Fog(true, fogColour, 0.02f));
 
         // Setup  SkyBox
 //        SkyBox skyBox = new SkyBox(Game.path + "/engine/resources/models/skybox.obj", new Vector4f(0.65f, 0.65f, 0.65f, 1.0f));
@@ -209,7 +237,6 @@ public class GameStateTest implements State {
 //        scene.setSkyBox(skyBox);
 
         // Setup  SkyBox
-
         SkyBox skyBox = new SkyBox(Game.path + "\\engine\\resources/models/skybox.obj", "\\engine\\resources/textures/skybox.png");
         skyBox.setScale(viewDistance);
         scene.setSkyBox(skyBox);
@@ -218,13 +245,18 @@ public class GameStateTest implements State {
         setupLights();
 
         camera.getPosition().x = 0f;
-        camera.getPosition().y = 150f;
+        camera.getPosition().y = 64f;
         camera.getPosition().z = 0f;
 
         camera.getRotation().x = 25;
         camera.getRotation().y = -1;
 
         camPos = new Vector3f(camera.getPosition());
+
+        // Sounds
+        this.soundMgr.init();
+        this.soundMgr.setAttenuationModel(AL11.AL_EXPONENT_DISTANCE);
+        setupSounds();
 
     }
 
@@ -274,6 +306,19 @@ public class GameStateTest implements State {
         PointLight.Attenuation attenuation = new PointLight.Attenuation(1, 0.0f, 0);
         PointLight pointLight = new PointLight(pointLightColour, pointLightPos, lightIntensity, attenuation);
         sceneLight.setPointLightList( new PointLight[] {pointLight});
+    }
+
+    private void setupSounds() throws Exception {
+        SoundBuffer buffFire = new SoundBuffer("\\engine\\resources/sounds/fire.ogg");
+        soundMgr.addSoundBuffer(buffFire);
+        SoundSource sourceFire = new SoundSource(true, false);
+        Vector3f pos = new Vector3f(0, 72, 0);
+        sourceFire.setPosition(pos);
+        sourceFire.setBuffer(buffFire.getBufferId());
+        soundMgr.addSoundSource(Sounds.FIRE.toString(), sourceFire);
+        sourceFire.play();
+
+        soundMgr.setListener(new SoundListener(new Vector3f(0, 0, 0)));
     }
 
     @Override
@@ -349,6 +394,15 @@ public class GameStateTest implements State {
 
         // Update view matrix
         camera.updateViewMatrix();
+
+        // Update sound listener position;
+        soundMgr.updateListenerPosition(camera);
+
+        boolean aux = mouseInput.isLeftButtonPressed();
+        if (aux && !this.leftButtonPressed) {
+            this.hud.incCounter();
+        }
+        this.leftButtonPressed = aux;
 
         // TODO: Coordinate calculations in List<Vector3f> spawn tons of vectors.
 
@@ -429,13 +483,18 @@ public class GameStateTest implements State {
             firstTime = false;
         }
         renderer.render(window, camera, scene, sceneChanged);
+        hud.render(window);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
+        soundMgr.cleanup();
 
         scene.cleanup();
+        if (hud != null) {
+            hud.cleanup();
+        }
     }
 
     @Override

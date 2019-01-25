@@ -25,7 +25,7 @@ public class Grass extends Block {
 
     @Override
     public Mesh[] makeMesh() throws Exception {
-        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt\\cube.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\dirt");
+        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\grass\\grass.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\grass");
     }
 
     @Override
