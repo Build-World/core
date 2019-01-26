@@ -8,7 +8,7 @@ public class Plains extends Biome {
     public Plains() throws Exception {
         setCoreThickness(5);
 
-        setTemperature(20);
+        setTemperature(15);
         setTemperatureRange(10);
         setPercipitation(0.5f);
         setPercipitationRange(0.1f);

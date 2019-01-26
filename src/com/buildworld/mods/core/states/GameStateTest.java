@@ -6,6 +6,8 @@ import com.buildworld.engine.audio.sound.SoundManager;
 import com.buildworld.engine.audio.sound.SoundSource;
 import com.buildworld.engine.graphics.Renderer;
 import com.buildworld.engine.graphics.Window;
+import com.buildworld.engine.graphics.animations.AnimGameItem;
+import com.buildworld.engine.graphics.animations.Animation;
 import com.buildworld.engine.graphics.camera.Camera;
 import com.buildworld.engine.graphics.game.GameItem;
 import com.buildworld.engine.graphics.game.Scene;
@@ -15,6 +17,7 @@ import com.buildworld.engine.graphics.lights.DirectionalLight;
 import com.buildworld.engine.graphics.lights.PointLight;
 import com.buildworld.engine.graphics.lights.SceneLight;
 import com.buildworld.engine.graphics.loaders.OBJLoader;
+import com.buildworld.engine.graphics.loaders.assimp.AnimMeshesLoader;
 import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
 import com.buildworld.engine.graphics.materials.Material;
 import com.buildworld.engine.graphics.mesh.HeightMapMesh;
@@ -93,7 +96,7 @@ public class GameStateTest implements State {
     private final int dayLength = 120;
 
     private Vector3f camPos;
-    private static final int DESIRED_RENDER_UPDATE_DELAY = 10;
+    private static final int DESIRED_RENDER_UPDATE_DELAY = 2;
     private int render_ticks = DESIRED_RENDER_UPDATE_DELAY;
 
     private Galaxy galaxy;
@@ -104,6 +107,14 @@ public class GameStateTest implements State {
     private WorldController worldController;
 
     private Vector3f pointLightPos;
+
+    private Animation animation;
+
+    private AnimGameItem animItem;
+
+    private List<GameItem> gameItems = new ArrayList<>();
+
+    private Window window;
 
 
     private enum Sounds {
@@ -138,6 +149,7 @@ public class GameStateTest implements State {
 
     @Override
     public void init(Window window) throws Exception {
+        this.window = window;
         hud.init(window);
         renderer.init(window);
         soundMgr.init();
@@ -146,6 +158,8 @@ public class GameStateTest implements State {
 
         scene = new Scene();
         galaxy = new Galaxy();
+
+        selectDetector = new MouseBoxSelectionDetector();
 
         ///// THIS IS WHERE THE COMMENT BEGAN
 
@@ -219,7 +233,18 @@ public class GameStateTest implements State {
         Mesh[] houseMesh = StaticMeshesLoader.load(Game.path + "\\engine\\resources\\models\\house/house.obj", "\\engine\\resources\\models\\house");
         GameItem house = new GameItem(houseMesh);
         house.setPosition(0,32,0);
-        scene.setGameItems(new GameItem[]{house});
+
+        animItem = AnimMeshesLoader.loadAnimGameItem(Game.path + "\\engine\\resources\\models/bob/boblamp.md5mesh", "\\engine\\resources");
+        animItem.setScale(0.05f);
+        animItem.setPosition(0,64,0);
+        animation = animItem.getCurrentAnimation();
+
+        Mesh[] deadmausMesh = StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\deadmau5/deadmau5.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\deadmau5");
+        GameItem deadmaus = new GameItem(deadmausMesh);
+        deadmaus.setScale(2f);
+        deadmaus.setPosition(0,70,0);
+
+        scene.setGameItems(new GameItem[]{house, animItem, deadmaus});
 
 
         ///// THIS IS WHERE THE COMMENT ENDED
@@ -283,7 +308,9 @@ public class GameStateTest implements State {
 
         this.worldController = worldController;
 
-        scene.setGameItems(world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance));
+        List<Block> items = world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance);
+        gameItems.addAll(items);
+        scene.setGameItems(items);
         world.getAdded().clear();
     }
 
@@ -301,11 +328,11 @@ public class GameStateTest implements State {
         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), lightDirection, lightIntensity);
         sceneLight.setDirectionalLight(directionalLight);
 
-        pointLightPos = new Vector3f(0.0f, 25.0f, 0.0f);
-        Vector3f pointLightColour = new Vector3f(0.0f, 1.0f, 0.0f);
-        PointLight.Attenuation attenuation = new PointLight.Attenuation(1, 0.0f, 0);
-        PointLight pointLight = new PointLight(pointLightColour, pointLightPos, lightIntensity, attenuation);
-        sceneLight.setPointLightList( new PointLight[] {pointLight});
+//        pointLightPos = new Vector3f(0.0f, 25.0f, 0.0f);
+//        Vector3f pointLightColour = new Vector3f(0.0f, 1.0f, 0.0f);
+//        PointLight.Attenuation attenuation = new PointLight.Attenuation(1, 0.0f, 0);
+//        PointLight pointLight = new PointLight(pointLightColour, pointLightPos, lightIntensity, attenuation);
+//        sceneLight.setPointLightList( new PointLight[] {pointLight});
     }
 
     private void setupSounds() throws Exception {
@@ -357,16 +384,35 @@ public class GameStateTest implements State {
         }
         if (window.isKeyPressed(GLFW_KEY_UP)) {
             sceneChanged = true;
-            pointLightPos.y += 0.5f;
+//            pointLightPos.y += 0.5f;
         } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
             sceneChanged = true;
-            pointLightPos.y -= 0.5f;
+//            pointLightPos.y -= 0.5f;
+        }
+
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) {
+            sceneChanged = true;
+            animation.nextFrame();
+        }
+
+        if(window.isKeyPressed(GLFW_KEY_C))
+        {
+            System.out.println("Cam coords: " + camPos.x + ", " + camPos.y + ", " + camPos.z);
         }
     }
 
     @Override
     public void update(float interval, MouseInput mouseInput) throws Exception {
-        scene.setGameItems(world.getUpdatedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance));
+        List<Block> items = world.getAddedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance);
+        gameItems.addAll(items);
+        scene.setGameItems(items);
+
+        List<Block> blocks = world.getRemoved();
+        gameItems.removeAll(blocks);
+        scene.removeGameItems(blocks);
+        world.getRemoved().clear();
+
+
 
         if (mouseInput.isRightButtonPressed()) {
             // Update camera based on mouse
@@ -400,7 +446,15 @@ public class GameStateTest implements State {
 
         boolean aux = mouseInput.isLeftButtonPressed();
         if (aux && !this.leftButtonPressed) {
-            this.hud.incCounter();
+            GameItem selectedGameItem = this.selectDetector.selectGameItem(gameItems.toArray(new GameItem[0]), window, mouseInput.getCurrentPos(), camera);
+            if(selectedGameItem != null)
+            {
+                this.hud.incCounter();
+                if(true)
+                {
+                    world.removeBlock((Block)selectedGameItem);
+                }
+            }
         }
         this.leftButtonPressed = aux;
 
@@ -409,7 +463,6 @@ public class GameStateTest implements State {
         if(render_ticks == 0)
         {
             int camX = (int)camera.getPosition().x, camZ= (int)camera.getPosition().z,  camY= (int)camera.getPosition().y;
-            System.out.println("Cam coords: " + camX + ", " + camY + ", " + camZ);
             if(camX != (int)camPos.x || camZ != (int)camPos.z || camY != (int)camPos.y)
             {
                 List<Vector3f> coords = world.getMovedRegionCoords((int)camPos.x, (int)camPos.y, (int)camPos.z,camX,camY,camZ, loadDistance);
@@ -417,14 +470,18 @@ public class GameStateTest implements State {
 
                 System.out.println("coords: " + coords.size());
 
-                scene.removeGameItems(world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z))));
+                items = world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z)));
+                gameItems.removeAll(items);
+                scene.removeGameItems(items);
                 List<Block> blockList = world.getMovedRegion(coords);
                 System.out.println("RenderBlocks: " + blockList.size());
                 if(blockList.size() != 0) {
                     Block block = blockList.get(0);
                     System.out.println("Block: x: " + block.getPosition().x + " y: " + block.getPosition().y + " z: " + block.getPosition().z);
                 }
-                scene.setGameItems(world.getMovedRegion(coords));
+                items = world.getMovedRegion(coords);
+                gameItems.removeAll(items);
+                scene.setGameItems(items);
             }
 
             camPos.set(camX, camY, camZ);

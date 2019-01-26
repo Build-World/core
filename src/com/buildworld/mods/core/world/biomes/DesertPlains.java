@@ -8,7 +8,7 @@ public class DesertPlains extends Biome {
     public DesertPlains() throws Exception {
         setCoreThickness(5);
 
-        setTemperature(45);
+        setTemperature(35);
         setTemperatureRange(15);
         setPercipitation(0.1f);
         setPercipitationRange(0.1f);
