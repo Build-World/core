@@ -1,15 +1,9 @@
 package com.buildworld.mods.core.blocks;
 
-import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
-import com.buildworld.engine.graphics.mesh.Mesh;
-import com.buildworld.game.Game;
 import com.buildworld.game.blocks.Block;
-import com.buildworld.game.blocks.Material;
 import com.buildworld.game.blocks.types.Mundane;
-import com.buildworld.game.graphics.Texture;
 
 public class Water extends Block {
-    private static Material material;
 
     public Water() throws Exception
     {
@@ -22,8 +16,23 @@ public class Water extends Block {
     }
 
     @Override
-    public Mesh[] makeMesh() throws Exception {
-        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\water\\water.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\water");
+    public void initialize() throws Exception {
+
+    }
+
+    @Override
+    protected void ready() throws Exception {
+
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\water";
+    }
+
+    @Override
+    public String getModelFilename() {
+        return "water.obj";
     }
 
     @Override

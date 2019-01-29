@@ -2,4 +2,4 @@ newmtl water_mat
 Kd 0.59 0.45 0.35
 Ka 0.59 0.45 0.35
 Ks 0.59 0.45 0.35
-map_Kd water.png
+map_Kd water_64.png

@@ -1,20 +1,11 @@
 package com.buildworld.mods.core.blocks;
 
-import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
-import com.buildworld.engine.graphics.mesh.Mesh;
-import com.buildworld.engine.graphics.mesh.meshes.CubeMesh;
-import com.buildworld.game.Game;
-import com.buildworld.game.graphics.Texture;
 import com.buildworld.game.blocks.Block;
-import com.buildworld.game.blocks.Material;
-import com.buildworld.game.blocks.types.Mundane;
 import com.buildworld.game.events.IUpdateable;
 import com.buildworld.mods.core.blocks.properties.Electricity;
 import com.buildworld.mods.core.blocks.types.Electric;
 
 public class Wire extends Block implements IUpdateable {
-
-    private static Material material;
 
     public Wire() throws Exception
     {
@@ -27,8 +18,18 @@ public class Wire extends Block implements IUpdateable {
     }
 
     @Override
-    public Mesh[] makeMesh() throws Exception {
-        return StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\wire\\wire.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\wire");
+    public void initialize() throws Exception {
+
+    }
+
+    @Override
+    public String getResourcePath() {
+        return "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\wire";
+    }
+
+    @Override
+    public String getModelFilename() {
+        return "wire.obj";
     }
 
     @Override

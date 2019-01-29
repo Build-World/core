@@ -3,7 +3,6 @@ package com.buildworld.mods.core.states;
 import com.buildworld.engine.graphics.Renderer;
 import com.buildworld.engine.graphics.Window;
 import com.buildworld.engine.graphics.camera.Camera;
-import com.buildworld.engine.graphics.game.GameItem;
 import com.buildworld.engine.graphics.game.Scene;
 import com.buildworld.engine.graphics.game.SkyBox;
 import com.buildworld.engine.graphics.lights.DirectionalLight;
@@ -121,7 +120,7 @@ public class GameState implements State {
         worldController.loadRegion(new Vector2f(1,0));
         worldController.loadRegion(new Vector2f(1,1));*/
 
-        scene.setGameItems(world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance));
+//        scene.setGameItems(world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance));
         world.getAdded().clear();
         //scene.setGameItems(world.getUpdatedInRange((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance));
     }
@@ -169,7 +168,7 @@ public class GameState implements State {
     @Override
     public void update(float interval, MouseInput mouseInput) throws Exception {
 
-        scene.setGameItems(world.getUpdatedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance));
+//        scene.setGameItems(world.getUpdatedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance));
 
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
@@ -225,9 +224,9 @@ public class GameState implements State {
                 List<Vector3f> flipped = world.flipMovedRegionCoords(coords, (int)camPos.x,(int)camPos.y,(int)camPos.z, true,true, true);
 
                 System.out.println("coords: " + coords.size());
-
-                scene.removeGameItems(world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z))));
-                scene.setGameItems(world.getMovedRegion(coords));
+//
+//                scene.removeGameItems(world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z))));
+//                scene.setGameItems(world.getMovedRegion(coords));
             }
 
             camPos.set(camX, camY, camZ);
@@ -247,10 +246,10 @@ public class GameState implements State {
     @Override
     public void cleanup() {
         renderer.cleanup();
-        Map<Mesh, List<GameItem>> mapMeshes = scene.getGameMeshes();
-        for (Mesh mesh : mapMeshes.keySet()) {
-            mesh.cleanUp();
-        }
+//        Map<Mesh, List<GameItem>> mapMeshes = scene.getGameMeshes();
+//        for (Mesh mesh : mapMeshes.keySet()) {
+//            mesh.cleanUp();
+//        }
         hud.cleanup();
     }
 

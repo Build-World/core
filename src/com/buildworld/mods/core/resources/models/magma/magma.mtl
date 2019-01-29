@@ -2,4 +2,4 @@ newmtl magma_mat
 Kd 0.59 0.45 0.35
 Ka 0.59 0.45 0.35
 Ks 0.59 0.45 0.35
-map_Kd magma.png
+map_Kd magma_64.png

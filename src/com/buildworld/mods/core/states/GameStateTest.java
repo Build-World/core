@@ -6,17 +6,16 @@ import com.buildworld.engine.audio.sound.SoundManager;
 import com.buildworld.engine.audio.sound.SoundSource;
 import com.buildworld.engine.graphics.Renderer;
 import com.buildworld.engine.graphics.Window;
-import com.buildworld.engine.graphics.animations.AnimGameItem;
+import com.buildworld.engine.graphics.animations.AnimRenderable;
 import com.buildworld.engine.graphics.animations.Animation;
 import com.buildworld.engine.graphics.camera.Camera;
-import com.buildworld.engine.graphics.game.GameItem;
+import com.buildworld.engine.graphics.game.Renderable;
 import com.buildworld.engine.graphics.game.Scene;
 import com.buildworld.engine.graphics.game.SkyBox;
 import com.buildworld.engine.graphics.game.Terrain;
 import com.buildworld.engine.graphics.lights.DirectionalLight;
 import com.buildworld.engine.graphics.lights.PointLight;
 import com.buildworld.engine.graphics.lights.SceneLight;
-import com.buildworld.engine.graphics.loaders.OBJLoader;
 import com.buildworld.engine.graphics.loaders.assimp.AnimMeshesLoader;
 import com.buildworld.engine.graphics.loaders.assimp.StaticMeshesLoader;
 import com.buildworld.engine.graphics.materials.Material;
@@ -32,6 +31,7 @@ import com.buildworld.game.blocks.Block;
 import com.buildworld.game.hud.Hud;
 import com.buildworld.game.interactables.MouseBoxSelectionDetector;
 import com.buildworld.game.state.State;
+import com.buildworld.game.voxels.VoxelScene;
 import com.buildworld.game.world.WorldController;
 import com.buildworld.game.world.WorldState;
 import com.buildworld.game.world.areas.Chunk;
@@ -66,7 +66,7 @@ public class GameStateTest implements State {
 
     private final Camera camera;
 
-    private Scene scene;
+    private VoxelScene scene;
 
     private Hud hud;
 
@@ -92,7 +92,6 @@ public class GameStateTest implements State {
     private float lightAngle;
 
     private final int viewDistance = 4 * 16;
-    private final int loadDistance = viewDistance + 1 * 16;
     private final int dayLength = 120;
 
     private Vector3f camPos;
@@ -106,13 +105,9 @@ public class GameStateTest implements State {
 
     private WorldController worldController;
 
-    private Vector3f pointLightPos;
+    private Animation animation, animation2;
 
-    private Animation animation;
-
-    private AnimGameItem animItem;
-
-    private List<GameItem> gameItems = new ArrayList<>();
+    private AnimRenderable animItem, animItem2;
 
     private Window window;
 
@@ -135,10 +130,6 @@ public class GameStateTest implements State {
         return viewDistance;
     }
 
-    public int getLoadDistance() {
-        return loadDistance;
-    }
-
     public int getDayLength() {
         return dayLength;
     }
@@ -156,82 +147,13 @@ public class GameStateTest implements State {
 
         leftButtonPressed = false;
 
-        scene = new Scene();
+        scene = new VoxelScene();
         galaxy = new Galaxy();
 
         selectDetector = new MouseBoxSelectionDetector();
 
-        ///// THIS IS WHERE THE COMMENT BEGAN
-
-
-//        float blockScale = 0.5f;
-//        float skyBoxScale = 100.0f;
-//        float extension = 2.0f;
-//
-//        float startx = extension * (-skyBoxScale + blockScale);
-//        float startz = extension * (skyBoxScale - blockScale);
-//        float starty = -1.0f;
-//        float inc = blockScale * 2;
-//
-//        float posx = startx;
-//        float posz = startz;
-//        float incy = 0.0f;
-//
-//        PNGDecoder decoder = new PNGDecoder(new FileInputStream(Game.path + "/engine/resources/textures/heightmap.png"));
-//        int height = decoder.getHeight();
-//        int width = decoder.getWidth();
-//        ByteBuffer buf = ByteBuffer.allocateDirect(4 * width * height);
-//        decoder.decode(buf, width * 4, PNGDecoder.Format.RGBA);
-//        buf.flip();
-//
-//        int instances = height * width;
-//        Mesh mesh = OBJLoader.loadMesh(Game.path + "/engine/resources/models/cube.obj", instances);
-//        Texture texture = new Texture(Game.path + "/engine/resources/textures/terrain_textures.png", 2, 1);
-//        Material material = new Material(texture, reflectance);
-//        mesh.setMaterial(material);
-//        GameItem[] gameItems = new GameItem[instances];
-//        for (int i = 0; i < height; i++) {
-//            for (int j = 0; j < width; j++) {
-//                GameItem gameItem = new GameItem(mesh);
-//                gameItem.setScale(blockScale);
-//                int rgb = HeightMapMesh.getRGB(i, j, width, buf);
-//                incy = rgb / (10 * 255 * 255);
-//                gameItem.setPosition(posx, starty + incy, posz);
-//                int textPos = Math.random() > 0.5f ? 0 : 1;
-//                gameItem.setTextPos(textPos);
-//                gameItems[i * width + j] = gameItem;
-//
-//                posx += inc;
-//            }
-//            posx = startx;
-//            posz -= inc;
-//        }
-//        scene.setGameItems(gameItems);
-//
-//        // Particles
-//        int maxParticles = 200;
-//        Vector3f particleSpeed = new Vector3f(0, 1, 0);
-//        particleSpeed.mul(2.5f);
-//        long ttl = 4000;
-//        long creationPeriodMillis = 300;
-//        float range = 0.2f;
-//        float scale = 1.0f;
-//        Mesh partMesh = OBJLoader.loadMesh(Game.path + "/engine/resources/models/particle.obj", maxParticles);
-//        Texture particleTexture = new Texture(Game.path + "/engine/resources/textures/particle_anim.png", 4, 4);
-//        Material partMaterial = new Material(particleTexture, reflectance);
-//        partMesh.setMaterial(partMaterial);
-//        Particle particle = new Particle(partMesh, particleSpeed, ttl, 100);
-//        particle.setScale(scale);
-//        particleEmitter = new FlowParticleEmitter(particle, maxParticles, creationPeriodMillis);
-//        particleEmitter.setActive(true);
-//        particleEmitter.setPositionRndRange(range);
-//        particleEmitter.setSpeedRndRange(range);
-//        particleEmitter.setAnimRange(10);
-//        this.scene.setParticleEmitters(new FlowParticleEmitter[]{particleEmitter});
-
-
         Mesh[] houseMesh = StaticMeshesLoader.load(Game.path + "\\engine\\resources\\models\\house/house.obj", "\\engine\\resources\\models\\house");
-        GameItem house = new GameItem(houseMesh);
+        Renderable house = new Renderable(houseMesh);
         house.setPosition(0,32,0);
 
         animItem = AnimMeshesLoader.loadAnimGameItem(Game.path + "\\engine\\resources\\models/bob/boblamp.md5mesh", "\\engine\\resources");
@@ -240,14 +162,16 @@ public class GameStateTest implements State {
         animation = animItem.getCurrentAnimation();
 
         Mesh[] deadmausMesh = StaticMeshesLoader.load(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\deadmau5/deadmau5.obj", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\deadmau5");
-        GameItem deadmaus = new GameItem(deadmausMesh);
-        deadmaus.setScale(2f);
+        Renderable deadmaus = new Renderable(deadmausMesh);
+        deadmaus.setScale(0.2f);
         deadmaus.setPosition(0,70,0);
 
-        scene.setGameItems(new GameItem[]{house, animItem, deadmaus});
+        animItem2 = AnimMeshesLoader.loadAnimGameItem(Game.path + "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\deadmau5/deadmau5.fbx", "\\core\\src\\com\\buildworld\\mods\\core\\resources\\models\\deadmau5");
+        animItem2.setScale(0.2f);
+        animItem2.setPosition(0,80,0);
+        animation2 = animItem2.getCurrentAnimation();
 
-
-        ///// THIS IS WHERE THE COMMENT ENDED
+        scene.setGameItems(new Renderable[]{house, animItem, deadmaus, animItem2});
 
         // Shadows
         scene.setRenderShadows(true);
@@ -308,9 +232,9 @@ public class GameStateTest implements State {
 
         this.worldController = worldController;
 
-        List<Block> items = world.getRegion((int)camera.getPosition().x, (int)camera.getPosition().y, (int)camera.getPosition().z, viewDistance);
-        gameItems.addAll(items);
-        scene.setGameItems(items);
+        Set<Chunk> items = world.getChunksInRange((int)camera.getPosition().x, (int)camera.getPosition().z, viewDistance);
+        scene.replace(items);
+        scene.bake();
         world.getAdded().clear();
     }
 
@@ -403,16 +327,8 @@ public class GameStateTest implements State {
 
     @Override
     public void update(float interval, MouseInput mouseInput) throws Exception {
-        List<Block> items = world.getAddedInRange((int)camPos.x, (int)camPos.y, (int)camPos.z, loadDistance);
-        gameItems.addAll(items);
-        scene.setGameItems(items);
-
-        List<Block> blocks = world.getRemoved();
-        gameItems.removeAll(blocks);
-        scene.removeGameItems(blocks);
-        world.getRemoved().clear();
-
-
+        int camX = (int)camera.getPosition().x, camZ= (int)camera.getPosition().z,  camY= (int)camera.getPosition().y;
+        animation2.nextFrame();
 
         if (mouseInput.isRightButtonPressed()) {
             // Update camera based on mouse
@@ -444,48 +360,19 @@ public class GameStateTest implements State {
         // Update sound listener position;
         soundMgr.updateListenerPosition(camera);
 
-        boolean aux = mouseInput.isLeftButtonPressed();
-        if (aux && !this.leftButtonPressed) {
-            GameItem selectedGameItem = this.selectDetector.selectGameItem(gameItems.toArray(new GameItem[0]), window, mouseInput.getCurrentPos(), camera);
-            if(selectedGameItem != null)
-            {
-                this.hud.incCounter();
-                if(true)
-                {
-                    world.removeBlock((Block)selectedGameItem);
-                }
-            }
-        }
-        this.leftButtonPressed = aux;
-
-        // TODO: Coordinate calculations in List<Vector3f> spawn tons of vectors.
-
-        if(render_ticks == 0)
-        {
-            int camX = (int)camera.getPosition().x, camZ= (int)camera.getPosition().z,  camY= (int)camera.getPosition().y;
-            if(camX != (int)camPos.x || camZ != (int)camPos.z || camY != (int)camPos.y)
-            {
-                List<Vector3f> coords = world.getMovedRegionCoords((int)camPos.x, (int)camPos.y, (int)camPos.z,camX,camY,camZ, loadDistance);
-                List<Vector3f> flipped = world.flipMovedRegionCoords(coords, (int)camPos.x,(int)camPos.y,(int)camPos.z, true,true, true);
-
-                System.out.println("coords: " + coords.size());
-
-                items = world.getMovedRegion(world.translateRegionCoords(flipped, new Vector3f(camX - (int)camPos.x, camZ - (int)camPos.y, camZ - (int)camPos.z)));
-                gameItems.removeAll(items);
-                scene.removeGameItems(items);
-                List<Block> blockList = world.getMovedRegion(coords);
-                System.out.println("RenderBlocks: " + blockList.size());
-                if(blockList.size() != 0) {
-                    Block block = blockList.get(0);
-                    System.out.println("Block: x: " + block.getPosition().x + " y: " + block.getPosition().y + " z: " + block.getPosition().z);
-                }
-                items = world.getMovedRegion(coords);
-                gameItems.removeAll(items);
-                scene.setGameItems(items);
-            }
-
-            camPos.set(camX, camY, camZ);
-        }
+//        boolean aux = mouseInput.isLeftButtonPressed();
+//        if (aux && !this.leftButtonPressed) {
+//            Renderable selectedGameItem = this.selectDetector.selectGameItem(gameItems.toArray(new GameItem[0]), window, mouseInput.getCurrentPos(), camera);
+//            if(selectedGameItem != null)
+//            {
+//                this.hud.incCounter();
+//                if(true)
+//                {
+//                    world.removeBlock((Block)selectedGameItem);
+//                }
+//            }
+//        }
+//        this.leftButtonPressed = aux;
 
         boolean newRegion = false;
         Vector2f oldRegion = null;
@@ -526,9 +413,21 @@ public class GameStateTest implements State {
             worldController.loadRegion(this.currentCameraRegion);
         }
 
+        if(render_ticks == 0)
+        {
+            if(camX != (int)camPos.x || camZ != (int)camPos.z || camY != (int)camPos.y)
+            {
+                scene.replace(world.getChunksInRange(camX, camZ, viewDistance));
+            }
+        }
+
+        scene.bake();
+
         render_ticks--;
         if(render_ticks < 0)
             render_ticks = DESIRED_RENDER_UPDATE_DELAY;
+
+        camPos.set(camX, camY, camZ);
 
 //        particleEmitter.update((long) (interval * 1000));
     }

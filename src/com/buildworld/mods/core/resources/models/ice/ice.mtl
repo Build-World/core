@@ -2,4 +2,4 @@ newmtl ice_mat
 Kd 0.59 0.45 0.35
 Ka 0.59 0.45 0.35
 Ks 0.59 0.45 0.35
-map_Kd ice.png
+map_Kd ice_64.png
